@@ -1,5 +1,4 @@
 ﻿using System;
-using System.IO;
 using System.Text.RegularExpressions;
 
 namespace Logger
@@ -7,10 +6,17 @@ namespace Logger
 	public class Logger : ILogger
 	{
 		private readonly string _path;
+
 		private static readonly Regex DateTimePatternRegex = new Regex(
             @"\[(date|time)\]", 
             RegexOptions.IgnoreCase | RegexOptions.Compiled
         );
+		private static readonly Regex LogStringPatternRegex = new Regex(
+			@"\[(timestamp|level|message)\]",
+			RegexOptions.IgnoreCase | RegexOptions.Compiled
+		);
+
+		private readonly LogWriter _writer;
 
 		public LoggerOptions _options;
 
@@ -18,25 +24,37 @@ namespace Logger
 		{
 			_path = path;
 			_options = initializer;
+			_writer = new LogWriter(path, _options);
 		}
 
 		public Logger(string path) : this(path, new LoggerOptions()) {}
 
 		public void Log(LogLevel level, string message)
 		{
-			using (StreamWriter writer = new StreamWriter(_path, true, _options.encoding))
-			{
-				writer.WriteLine(BuildLogString(level, message));
-			}
+			_writer.Write(BuildLogString(level, message));
 		}
 
-		private string BuildLogString(LogLevel level, string message) {
+		private string BuildLogString(LogLevel level, string message)
+		{
 			var timestamp = GetDateTime();
 			var levelString = GetLevelWord(level);
-			return $"{timestamp} {levelString} {message}";
+			return LogStringPatternRegex.Replace(_options.LogStringPattern, match =>
+			{
+				var placeholder = match.Groups[1].Value.ToLower();
+
+				if (placeholder == "timestamp")
+					return timestamp;
+				else if (placeholder == "level")
+					return levelString;
+				else if (placeholder == "message")
+					return message;
+
+				return match.Value;
+			});
 		}
 
-		private string GetLevelWord(LogLevel level) {
+		private string GetLevelWord(LogLevel level)
+		{
 			switch (level) {
 				case LogLevel.Warning:
 					return _options.WarningWord;

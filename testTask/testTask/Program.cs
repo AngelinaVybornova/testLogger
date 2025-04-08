@@ -1,15 +1,15 @@
 ﻿using Logger;
 
 Console.WriteLine("Hello, World!");
-var logger = new Logger.Logger("C:\\Users\\ПК\\source\\repos\\testTask\\testTask\\log.txt");
-var logger2 = new Logger.Logger("C:\\Users\\ПК\\source\\repos\\testTask\\testTask\\log.txt", new LoggerOptions {
+var logger = new Logger.Logger("log.txt");
+var logger2 = new Logger.Logger("log.txt", new LoggerOptions {
 	DateTimePattern = "[date] at [TIME]",
 	LongTimePattern = "mm:ss/hh",
 	ShortDatePattern = "yyy.d.MM",
 
-	ErrorWord = "ERROR",
-	WarningWord = "WARNING",
-	InformationWord = "INFORMATION"
+	ErrorType = ErrorWords.E,
+	WarningType = WarningWords.W,
+	InformationType = InformationWords.I
 });
 
 logger.Log(LogLevel.Information, "test info");
