@@ -5,8 +5,6 @@ namespace Logger
 {
 	public class Logger : ILogger
 	{
-		private readonly string _path;
-
 		private static readonly Regex DateTimePatternRegex = new Regex(
             @"\[(date|time)\]", 
             RegexOptions.IgnoreCase | RegexOptions.Compiled
@@ -20,10 +18,9 @@ namespace Logger
 
 		public LoggerOptions _options;
 
-		public Logger(string path, LoggerOptions initializer)
+		public Logger(string path, LoggerOptions options)
 		{
-			_path = path;
-			_options = initializer;
+			_options = options;
 			_writer = new LogWriter(path, _options);
 		}
 
@@ -42,14 +39,17 @@ namespace Logger
 			{
 				var placeholder = match.Groups[1].Value.ToLower();
 
-				if (placeholder == "timestamp")
-					return timestamp;
-				else if (placeholder == "level")
-					return levelString;
-				else if (placeholder == "message")
-					return message;
-
-				return match.Value;
+				switch (placeholder)
+				{
+					case "timestamp":
+						return timestamp;
+					case "level":
+						return levelString;
+					case "message":
+						return message;
+					default:
+						return match.Value;
+				}
 			});
 		}
 
@@ -72,12 +72,15 @@ namespace Logger
 				var now = DateTime.Now;
 				var placeholder = match.Groups[1].Value.ToLower();
 
-				if (placeholder == "date")
-					return now.ToString(_options.ShortDatePattern);
-				else if (placeholder == "time")
-					return now.ToString(_options.LongTimePattern);
-
-				return match.Value;
+				switch (placeholder)
+				{
+					case "date":
+						return now.ToString(_options.ShortDatePattern);
+					case "time":
+						return now.ToString(_options.LongTimePattern);
+					default:
+						return match.Value;
+				}
 			});
 		}
 	}
