@@ -1,6 +1,0 @@
-﻿08.04.2025 | 5:18:59 INFO test info
-08.04.2025 | 5:18:59 WARN test warning
-08.04.2025 | 5:18:59 ERR test error
-2025.8.04 at 18:59.05 INFORMATION test info2
-2025.8.04 at 18:59.05 WARNING test warning2
-2025.8.04 at 18:59.05 ERROR test error2
